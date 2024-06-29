@@ -43,5 +43,4 @@ public class CacheConfig {
         conf.setPort(port);
         return new LettuceConnectionFactory(conf);
     }
-
 }
