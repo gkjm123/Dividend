@@ -26,26 +26,27 @@ public class Scheduler {
     private final DividendRepository dividendRepository;
     private final YahooFinanceScraper yahooFinanceScraper;
 
+    //아래 메서드가 수행될때 value 값이 CacheKey.KEY_FINANCE 인 캐시를 삭제한다.
     @CacheEvict(value = CacheKey.KEY_FINANCE, allEntries = true)
     @Scheduled(cron = "${scheduler.scrap.yahoo}")
     public void yahooFinanceScheduling() {
-
         List<CompanyEntity> companyEntities = companyRepository.findAll();
 
         for (CompanyEntity companyEntity : companyEntities) {
-            log.info("scraping scheduler is started -> " + companyEntity.getName());
-
+            log.info("scraping scheduler is started -> {}", companyEntity.getName());
             ScrapedResult scrapedResult = yahooFinanceScraper.scrap(new Company(companyEntity.getTicker(), companyEntity.getName()));
 
             scrapedResult.getDividends().stream()
-                    .map(e -> new DividendEntity(companyEntity.getId(), e))
+                    .map(e -> DividendEntity.builder()
+                            .companyId(companyEntity.getId())
+                            .dividend(e.getDividend())
+                            .build())
                     .forEach(e -> {
                         boolean exists = dividendRepository.existsByCompanyIdAndDate(e.getCompanyId(), e.getDate());
                         if (!exists) {
                             dividendRepository.save(e);
-                            log.info("insert new dividend -> " + e.toString());
+                            log.info("insert new dividend -> {}", e.toString());
                         }
-
                     });
 
             try {
@@ -54,6 +55,5 @@ public class Scheduler {
                 Thread.currentThread().interrupt();
             }
         }
-
     }
 }

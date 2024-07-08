@@ -17,7 +17,7 @@ public class FinanceController {
 
     @GetMapping("/dividend/{companyName}")
     public ResponseEntity<?> searchFinance(@PathVariable String companyName) {
-        ScrapedResult scrapedResult =  financeService.getDividendByCompanyName(companyName);
+        ScrapedResult scrapedResult = financeService.getDividendByCompanyName(companyName);
         return ResponseEntity.ok(scrapedResult);
     }
 }

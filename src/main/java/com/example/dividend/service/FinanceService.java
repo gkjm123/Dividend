@@ -25,7 +25,7 @@ public class FinanceService {
     @Cacheable(key = "#companyName", value = CacheKey.KEY_FINANCE)
     public ScrapedResult getDividendByCompanyName(String companyName) {
         CompanyEntity companyEntity = companyRepository.findByName(companyName)
-                .orElseThrow(() -> new NoCompanyException());
+                .orElseThrow(NoCompanyException::new);
 
         List<DividendEntity> dividendEntities = dividendRepository.findAllByCompanyId(companyEntity.getId());
 
@@ -33,7 +33,6 @@ public class FinanceService {
 
         List<Dividend> dividends = dividendEntities.stream()
                 .map(e -> new Dividend(e.getDate(), e.getDividend())).toList();
-
 
         return new ScrapedResult(company, dividends);
     }

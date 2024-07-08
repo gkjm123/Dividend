@@ -5,12 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
 @Slf4j
 @ControllerAdvice
 public class CustomExceptionHandler {
-
     @ExceptionHandler(AbstractException.class)
     protected ResponseEntity<?> handleCustomException(AbstractException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
@@ -20,5 +18,4 @@ public class CustomExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, HttpStatus.resolve(e.getStatusCode()));
     }
-
 }

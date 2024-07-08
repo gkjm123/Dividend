@@ -11,7 +11,6 @@ import lombok.*;
 @ToString
 @Entity(name="COMPANY")
 public class CompanyEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

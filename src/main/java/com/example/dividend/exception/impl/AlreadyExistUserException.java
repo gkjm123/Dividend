@@ -4,7 +4,6 @@ import com.example.dividend.exception.AbstractException;
 import org.springframework.http.HttpStatus;
 
 public class AlreadyExistUserException extends AbstractException {
-
     @Override
     public int getStatusCode() {
         return HttpStatus.BAD_REQUEST.value();

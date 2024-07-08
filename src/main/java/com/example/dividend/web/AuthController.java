@@ -1,7 +1,6 @@
 package com.example.dividend.web;
 
 import com.example.dividend.model.Auth;
-import com.example.dividend.persist.MemberRepository;
 import com.example.dividend.persist.entity.MemberEntity;
 import com.example.dividend.security.TokenProvider;
 import com.example.dividend.service.MemberService;
@@ -18,9 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
     private final MemberService memberService;
-
     private final TokenProvider tokenProvider;
 
     @PostMapping("/signup")

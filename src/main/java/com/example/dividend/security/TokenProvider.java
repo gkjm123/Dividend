@@ -1,13 +1,11 @@
 package com.example.dividend.security;
 
-import com.example.dividend.persist.entity.MemberEntity;
 import com.example.dividend.service.MemberService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
-import org.jsoup.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,10 +20,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class TokenProvider {
-
     private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60;
     private static final String KEY_ROLES = "roles";
-
     private final MemberService memberService;
 
     @Value("${spring.jwt.secret}")
@@ -44,7 +40,6 @@ public class TokenProvider {
                 .setExpiration(expiredDate)
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
-
     }
 
     @Transactional
@@ -61,14 +56,12 @@ public class TokenProvider {
 
     public boolean validateToken(String token) {
         if (!StringUtils.hasText(token)) return false;
-
-        Claims claims = parseClaims(token);
-        return !claims.getExpiration().before(new Date());
+        //토큰의 만료기간 전인지 확인
+        return !parseClaims(token).getExpiration().before(new Date());
     }
 
     private Claims parseClaims(String token) {
         try {
-            System.out.println("키: " + secretKey);
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         }
         catch (ExpiredJwtException e) {

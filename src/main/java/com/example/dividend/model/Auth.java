@@ -6,7 +6,6 @@ import lombok.Data;
 import java.util.List;
 
 public class Auth {
-
     @Data
     public static class SignIn {
         private String username;

@@ -1,7 +1,9 @@
 package com.example.dividend.model.constants;
 
-public enum Month {
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
+public enum Month {
     JAN("Jan", 1),
     FEB("Feb", 2),
     MAR("Mar", 3),
@@ -18,20 +20,12 @@ public enum Month {
     private String s;
     private int number;
 
-    Month(String s, int n) {
-        this.s = s;
-        this.number = n;
-    }
-
     public static int strToNumber(String s) {
         for (Month m : Month.values()) {
             if (m.s.equals(s)) {
                 return m.number;
             }
         }
-
         return -1;
     }
-
-
 }
