@@ -17,8 +17,8 @@ public enum Month {
     NOV("Nov", 11),
     DEC("Dec", 12);
 
-    private String s;
-    private int number;
+    final private String s;
+    final private int number;
 
     public static int strToNumber(String s) {
         for (Month m : Month.values()) {

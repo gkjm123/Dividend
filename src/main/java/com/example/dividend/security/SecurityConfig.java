@@ -45,12 +45,10 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         // 정적 리소스 spring security 대상에서 제외
-        return (web) -> {
-            web
-                    .ignoring()
-                    .requestMatchers(
-                            PathRequest.toStaticResources().atCommonLocations()
-                    );
-        };
+        return (web) -> web
+                .ignoring()
+                .requestMatchers(
+                        PathRequest.toStaticResources().atCommonLocations()
+                );
     }
 }
