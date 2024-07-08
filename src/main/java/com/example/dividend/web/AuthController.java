@@ -28,7 +28,10 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@RequestBody Auth.SignIn request) {
+        //아이디,비밀번호 확인
         MemberEntity memberEntity = memberService.authenticate(request);
+
+        //아이디,역할로 토큰 생성
         String token = tokenProvider.generateToken(memberEntity.getName(), memberEntity.getRoles());
         return ResponseEntity.ok(token);
     }
