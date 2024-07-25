@@ -9,31 +9,31 @@ import com.example.dividend.persist.CompanyRepository;
 import com.example.dividend.persist.DividendRepository;
 import com.example.dividend.persist.entity.CompanyEntity;
 import com.example.dividend.persist.entity.DividendEntity;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class FinanceService {
 
-    private final CompanyRepository companyRepository;
-    private final DividendRepository dividendRepository;
+  private final CompanyRepository companyRepository;
+  private final DividendRepository dividendRepository;
 
-    @Cacheable(key = "#companyName", value = CacheKey.KEY_FINANCE)
-    public ScrapedResult getDividendByCompanyName(String companyName) {
-        CompanyEntity companyEntity = companyRepository.findByName(companyName)
-                .orElseThrow(NoCompanyException::new);
+  @Cacheable(key = "#companyName", value = CacheKey.KEY_FINANCE)
+  public ScrapedResult getDividendByCompanyName(String companyName) {
+    CompanyEntity companyEntity = companyRepository.findByName(companyName)
+        .orElseThrow(NoCompanyException::new);
 
-        List<DividendEntity> dividendEntities = dividendRepository.findAllByCompanyId(companyEntity.getId());
+    List<DividendEntity> dividendEntities = dividendRepository.findAllByCompanyId(
+        companyEntity.getId());
 
-        Company company = new Company(companyEntity.getTicker(), companyEntity.getName());
+    Company company = new Company(companyEntity.getTicker(), companyEntity.getName());
 
-        List<Dividend> dividends = dividendEntities.stream()
-                .map(e -> new Dividend(e.getDate(), e.getDividend())).toList();
+    List<Dividend> dividends = dividendEntities.stream()
+        .map(e -> new Dividend(e.getDate(), e.getDividend())).toList();
 
-        return new ScrapedResult(company, dividends);
-    }
+    return new ScrapedResult(company, dividends);
+  }
 }

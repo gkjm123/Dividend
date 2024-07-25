@@ -8,70 +8,70 @@ import com.example.dividend.persist.DividendRepository;
 import com.example.dividend.persist.entity.CompanyEntity;
 import com.example.dividend.persist.entity.DividendEntity;
 import com.example.dividend.scraper.Scraper;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Service
 @AllArgsConstructor
 public class CompanyService {
-    private final Scraper yahooFinanceScraper;
-    private final CompanyRepository companyRepository;
-    private final DividendRepository dividendRepository;
 
-    public Company save(String ticker) {
-        boolean exists = companyRepository.existsByTicker(ticker);
+  private final Scraper yahooFinanceScraper;
+  private final CompanyRepository companyRepository;
+  private final DividendRepository dividendRepository;
 
-        if (exists) {
-            throw new RuntimeException("already existed ticker: " + ticker);
-        }
+  public Company save(String ticker) {
+    boolean exists = companyRepository.existsByTicker(ticker);
 
-        return storeCompanyAndDividend(ticker);
+    if (exists) {
+      throw new RuntimeException("already existed ticker: " + ticker);
     }
 
-    public Page<CompanyEntity> getAllCompany(Pageable pageable) {
-        return companyRepository.findAll(pageable);
+    return storeCompanyAndDividend(ticker);
+  }
+
+  public Page<CompanyEntity> getAllCompany(Pageable pageable) {
+    return companyRepository.findAll(pageable);
+  }
+
+  private Company storeCompanyAndDividend(String ticker) {
+    Company company = yahooFinanceScraper.scrapCompanyByTicker(ticker);
+
+    if (ObjectUtils.isEmpty(company)) {
+      throw new RuntimeException("failed to scrap company");
     }
 
-    private Company storeCompanyAndDividend(String ticker) {
-        Company company = yahooFinanceScraper.scrapCompanyByTicker(ticker);
+    ScrapedResult scrapedResult = yahooFinanceScraper.scrap(company);
 
-        if (ObjectUtils.isEmpty(company)) {
-            throw new RuntimeException("failed to scrap company");
-        }
+    CompanyEntity companyEntity = companyRepository.save(CompanyEntity.builder()
+        .name(company.getName())
+        .ticker(company.getTicker())
+        .build());
 
-        ScrapedResult scrapedResult = yahooFinanceScraper.scrap(company);
+    List<DividendEntity> dividendEntities = scrapedResult.getDividends().stream()
+        .map(e -> DividendEntity.builder()
+            .companyId(companyEntity.getId())
+            .date(LocalDateTime.now())
+            .dividend(e.getDividend())
+            .build())
+        .toList();
 
-        CompanyEntity companyEntity = companyRepository.save(CompanyEntity.builder()
-                .name(company.getName())
-                .ticker(company.getTicker())
-                .build());
+    dividendRepository.saveAll(dividendEntities);
 
-        List<DividendEntity> dividendEntities = scrapedResult.getDividends().stream()
-                .map(e -> DividendEntity.builder()
-                        .companyId(companyEntity.getId())
-                        .date(LocalDateTime.now())
-                        .dividend(e.getDividend())
-                        .build())
-                .toList();
+    return company;
+  }
 
-        dividendRepository.saveAll(dividendEntities);
+  public String deleteCompany(String ticker) {
+    CompanyEntity companyEntity = companyRepository.findByTicker(ticker)
+        .orElseThrow(NoCompanyException::new);
 
-        return company;
-    }
+    dividendRepository.deleteAllByCompanyId(companyEntity.getId());
+    companyRepository.delete(companyEntity);
 
-    public String deleteCompany(String ticker) {
-        CompanyEntity companyEntity = companyRepository.findByTicker(ticker)
-                .orElseThrow(NoCompanyException::new);
-
-        dividendRepository.deleteAllByCompanyId(companyEntity.getId());
-        companyRepository.delete(companyEntity);
-
-        return companyEntity.getName();
-    }
+    return companyEntity.getName();
+  }
 }

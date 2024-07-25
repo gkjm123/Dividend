@@ -18,37 +18,38 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize ->
-                        authorize
-                                .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
-                                .requestMatchers(AntPathRequestMatcher.antMatcher("/**/signup")).permitAll()
-                                .requestMatchers(AntPathRequestMatcher.antMatcher("/**/signin")).permitAll()
-                                .requestMatchers(AntPathRequestMatcher.antMatcher("/company/**")).permitAll()
-                                .anyRequest().authenticated()
-                )
-                .headers(
-                        headersConfigurer ->
-                                headersConfigurer
-                                        .frameOptions(
-                                                HeadersConfigurer.FrameOptionsConfig::sameOrigin
-                                        )
-                );
 
-        return http.build();
-    }
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(AbstractHttpConfigurer::disable)
+        .formLogin(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(authorize ->
+            authorize
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/**/signup")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/**/signin")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/company/**")).permitAll()
+                .anyRequest().authenticated()
+        )
+        .headers(
+            headersConfigurer ->
+                headersConfigurer
+                    .frameOptions(
+                        HeadersConfigurer.FrameOptionsConfig::sameOrigin
+                    )
+        );
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        // 정적 리소스 spring security 대상에서 제외
-        return (web) -> web
-                .ignoring()
-                .requestMatchers(
-                        PathRequest.toStaticResources().atCommonLocations()
-                );
-    }
+    return http.build();
+  }
+
+  @Bean
+  public WebSecurityCustomizer webSecurityCustomizer() {
+    // 정적 리소스 spring security 대상에서 제외
+    return (web) -> web
+        .ignoring()
+        .requestMatchers(
+            PathRequest.toStaticResources().atCommonLocations()
+        );
+  }
 }

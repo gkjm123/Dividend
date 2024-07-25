@@ -17,22 +17,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final MemberService memberService;
-    private final TokenProvider tokenProvider;
 
-    @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody Auth.SignUp request) {
-        MemberEntity memberEntity = memberService.register(request);
-        return ResponseEntity.ok(memberEntity);
-    }
+  private final MemberService memberService;
+  private final TokenProvider tokenProvider;
 
-    @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody Auth.SignIn request) {
-        //아이디,비밀번호 확인
-        MemberEntity memberEntity = memberService.authenticate(request);
+  @PostMapping("/signup")
+  public ResponseEntity<?> signup(@RequestBody Auth.SignUp request) {
+    MemberEntity memberEntity = memberService.register(request);
+    return ResponseEntity.ok(memberEntity);
+  }
 
-        //아이디,역할로 토큰 생성
-        String token = tokenProvider.generateToken(memberEntity.getName(), memberEntity.getRoles());
-        return ResponseEntity.ok(token);
-    }
+  @PostMapping("/signin")
+  public ResponseEntity<?> signin(@RequestBody Auth.SignIn request) {
+    //아이디,비밀번호 확인
+    MemberEntity memberEntity = memberService.authenticate(request);
+
+    //아이디,역할로 토큰 생성
+    String token = tokenProvider.generateToken(memberEntity.getName(), memberEntity.getRoles());
+    return ResponseEntity.ok(token);
+  }
 }

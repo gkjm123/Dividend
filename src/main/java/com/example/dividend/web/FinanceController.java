@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping("/finance")
 public class FinanceController {
-    final FinanceService financeService;
 
-    @GetMapping("/dividend/{companyName}")
-    public ResponseEntity<?> searchFinance(@PathVariable String companyName) {
-        ScrapedResult scrapedResult = financeService.getDividendByCompanyName(companyName);
-        return ResponseEntity.ok(scrapedResult);
-    }
+  final FinanceService financeService;
+
+  @GetMapping("/dividend/{companyName}")
+  public ResponseEntity<?> searchFinance(@PathVariable String companyName) {
+    ScrapedResult scrapedResult = financeService.getDividendByCompanyName(companyName);
+    return ResponseEntity.ok(scrapedResult);
+  }
 }
