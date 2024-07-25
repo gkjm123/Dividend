@@ -17,29 +17,32 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @RequiredArgsConstructor
 public class CacheConfig {
-    @Value("${spring.data.redis.host}")
-    private String host;
 
-    @Value("${spring.data.redis.port}")
-    private int port;
+  @Value("${spring.data.redis.host}")
+  private String host;
 
-    @Bean
-    public CacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration conf = RedisCacheConfiguration.defaultCacheConfig()
-                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+  @Value("${spring.data.redis.port}")
+  private int port;
 
-        return RedisCacheManager.RedisCacheManagerBuilder
-                .fromConnectionFactory(redisConnectionFactory)
-                .cacheDefaults(conf)
-                .build();
-    }
+  @Bean
+  public CacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
+    RedisCacheConfiguration conf = RedisCacheConfiguration.defaultCacheConfig()
+        .serializeKeysWith(
+            RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+        .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
+            new GenericJackson2JsonRedisSerializer()));
 
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
-        conf.setHostName(host);
-        conf.setPort(port);
-        return new LettuceConnectionFactory(conf);
-    }
+    return RedisCacheManager.RedisCacheManagerBuilder
+        .fromConnectionFactory(redisConnectionFactory)
+        .cacheDefaults(conf)
+        .build();
+  }
+
+  @Bean
+  public RedisConnectionFactory redisConnectionFactory() {
+    RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
+    conf.setHostName(host);
+    conf.setPort(port);
+    return new LettuceConnectionFactory(conf);
+  }
 }
